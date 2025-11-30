@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>链表尾部插入演示</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        h2 { color: #333; }
+        
+        .container { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; }
+        
+        /* 代码样式 */
+        .code-box { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; font-family: 'Consolas', monospace; font-size: 14px; width: 380px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .line { padding: 3px 6px; border-radius: 4px; border-left: 3px solid transparent; }
+        .line.active { background-color: #37373d; border-left-color: #4caf50; color: #fff; }
+        .comment { color: #6a9955; }
+        .keyword { color: #569cd6; }
+        .var { color: #9cdcfe; }
+
+        /* 动画区域 */
+        .visual-area { position: relative; width: 700px; height: 350px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        /* 节点 */
+        .node { position: absolute; width: 60px; height: 40px; background: #4dabf7; border: 2px solid #1864ab; border-radius: 6px; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; transition: all 0.6s ease; z-index: 2; }
+        .head-node { background: #ff8787; border-color: #c92a2a; }
+        .new-node { background: #69db7c; border-color: #2b8a3e; opacity: 0; top: 160px; left: 300px; }
+        .null-node { background: none; border: 2px dashed #adb5bd; color: #868e96; width: 50px; }
+        
+        /* SVG 线条 */
+        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        
+        /* 标记指针 */
+        .marker { position: absolute; font-size: 14px; font-weight: bold; color: #e64980; transition: all 0.6s ease; opacity: 0; text-align: center; width: 40px; }
+        
+        /* 按钮 */
+        .controls { margin-top: 25px; display: flex; gap: 15px; }
+        button { padding: 10px 25px; cursor: pointer; background: #228be6; color: white; border: none; border-radius: 5px; font-size: 16px; transition: background 0.3s; }
+        button:hover { background: #1c7ed6; }
+        button:disabled { background: #adb5bd; cursor: not-allowed; }
+        button.reset { background: #868e96; }
+
+        .explanation { margin-top: 15px; padding: 12px; background: #e7f5ff; border-left: 5px solid #228be6; color: #1864ab; max-width: 800px; border-radius: 0 4px 4px 0; min-height: 40px; }
+    </style>
+</head>
+<body>
+
+    <h2>链表尾部插入 (Insert at i=3, val=99)</h2>
+    <div class="explanation" id="explain-text">准备开始：我们将把 99 插入到第 3 个位置（即链表的最末尾）。<br>当前链表: Head -> 10 -> 20 -> NULL</div>
+
+    <div class="container">
+        <div class="code-box">
+            <div class="line" id="c1"><span class="keyword">Node</span>* <span class="var">p</span> = head; <span class="keyword">int</span> <span class="var">j</span> = 0;</div>
+            <div class="line" id="c2"><span class="comment">// 寻找第 i-1 个节点 (即第2个)</span></div>
+            <div class="line" id="c3"><span class="keyword">while</span> (p && j < i - 1) {</div>
+            <div class="line" id="c4">&nbsp;&nbsp;p = p->next; j++;</div>
+            <div class="line" id="c5">}</div>
+            <div class="line" id="c6"><span class="keyword">if</span> (!p || j > i - 1) <span class="keyword">return</span> <span class="keyword">false</span>;</div>
+            <div class="line" id="c7"><span class="keyword">Node</span>* <span class="var">s</span> = <span class="keyword">new</span> Node(e);</div>
+            <div class="line" id="c8">s->next = p->next; <span class="comment">// p->next此时是NULL</span></div>
+            <div class="line" id="c9">p->next = s;       <span class="comment">// p指向新尾巴</span></div>
+        </div>
+
+        <div class="visual-area">
+            <svg>
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+                    </marker>
+                </defs>
+                <!-- 静态连接线 -->
+                <line id="line-h-1" x1="90" y1="60" x2="150" y2="60" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+                <line id="line-1-2" x1="210" y1="60" x2="270" y2="60" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+                <line id="line-2-null" x1="330" y1="60" x2="390" y2="60" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+                
+                <!-- 动态连接线 -->
+                <line id="line-new-null" x1="0" y1="0" x2="0" y2="0" stroke="#2b8a3e" stroke-width="2" marker-end="url(#arrow)" style="display:none"/>
+            </svg>
+
+            <!-- 节点元素 -->
+            <div class="node head-node" style="left: 30px; top: 40px;">Head</div>
+            <div class="node" id="n1" style="left: 150px; top: 40px;">10</div>
+            <div class="node" id="n2" style="left: 270px; top: 40px;">20</div>
+            <div class="node null-node" id="null" style="left: 390px; top: 40px;">NULL</div>
+            
+            <div class="node new-node" id="new">99</div>
+
+            <!-- 指针标记 -->
+            <div class="marker" id="mk-p" style="top: 10px;">p</div>
+            <div class="marker" id="mk-s" style="top: 130px; opacity:0; left:310px;">s</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="reset" onclick="location.reload()">重置</button>
+        <button id="btn-next" onclick="nextStep()">下一步</button>
+    </div>
+
+    <script>
+        let step = 0;
+        const targetI = 3; // 插入到第3个位置 (10, 20, [99])
+        
+        function highlight(id) {
+            document.querySelectorAll('.line').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function explain(msg) {
+            document.getElementById('explain-text').innerHTML = msg;
+        }
+
+        function moveP(nodeIndex, leftPx) {
+            const p = document.getElementById('mk-p');
+            p.style.opacity = 1;
+            p.style.left = (leftPx + 10) + 'px'; // +10 for center align
+        }
+
+        function nextStep() {
+            step++;
+            const btn = document.getElementById('btn-next');
+            const line2Null = document.getElementById('line-2-null');
+            const lineNewNull = document.getElementById('line-new-null');
+            const nullNode = document.getElementById('null');
+
+            switch(step) {
+                case 1:
+                    highlight('c1');
+                    explain("初始化：p 指向 Head，j = 0。");
+                    moveP(0, 30);
+                    break;
+                case 2:
+                    highlight('c3');
+                    explain(`检查循环：j=0 < i-1=2。条件满足，准备后移。`);
+                    break;
+                case 3:
+                    highlight('c4');
+                    explain("p 后移指向第 1 个节点 (10)，j 变为 1。");
+                    moveP(1, 150);
+                    break;
+                case 4:
+                    highlight('c3');
+                    explain(`检查循环：j=1 < i-1=2。条件满足，继续后移。`);
+                    break;
+                case 5:
+                    highlight('c4');
+                    explain("p 后移指向第 2 个节点 (20)，j 变为 2。");
+                    moveP(2, 270);
+                    break;
+                case 6:
+                    highlight('c3');
+                    explain(`检查循环：j=2 < 2 不成立。循环结束。<br>此时 <strong>p 指向了链表的最后一个有效节点 (20)</strong>。`);
+                    break;
+                case 7:
+                    highlight('c7');
+                    explain("创建新节点 s (99)。");
+                    document.getElementById('new').style.opacity = 1;
+                    document.getElementById('mk-s').style.opacity = 1;
+                    break;
+                case 8:
+                    highlight('c8');
+                    explain("<strong>关键步骤 1：</strong> s->next = p->next。<br>因为 p 是最后一个节点，p->next 是 NULL。所以 s->next 也指向 NULL。");
+                    
+                    // 显示 s 指向 NULL 的线
+                    lineNewNull.style.display = 'block';
+                    lineNewNull.setAttribute('x1', 330); // s centerish
+                    lineNewNull.setAttribute('y1', 160);
+                    lineNewNull.setAttribute('x2', 400); // null node
+                    lineNewNull.setAttribute('y2', 80);
+                    break;
+                case 9:
+                    highlight('c9');
+                    explain("<strong>关键步骤 2：</strong> p->next = s。<br>断开 p 与 NULL 的连接，让 p 指向新节点 s。");
+                    
+                    // 修改原来的线，指向新节点
+                    line2Null.setAttribute('x2', 330);
+                    line2Null.setAttribute('y2', 160);
+                    line2Null.setAttribute('stroke', '#2b8a3e');
+                    break;
+                case 10:
+                    highlight('c9'); // keep highlight
+                    explain("演示结束：整理视图。链表变成了 Head -> 10 -> 20 -> 99 -> NULL。");
+                    
+                    // 动画整理位置
+                    document.getElementById('new').style.top = '40px';
+                    document.getElementById('new').style.left = '390px'; // 原来 NULL 的位置
+                    
+                    nullNode.style.left = '510px'; // NULL 往后挪
+                    
+                    // 修正线的位置
+                    line2Null.setAttribute('x2', 390);
+                    line2Null.setAttribute('y2', 60);
+                    line2Null.setAttribute('stroke', '#555');
+
+                    lineNewNull.setAttribute('x1', 450);
+                    lineNewNull.setAttribute('y1', 60);
+                    lineNewNull.setAttribute('x2', 510);
+                    lineNewNull.setAttribute('y2', 60);
+                    lineNewNull.setAttribute('stroke', '#555');
+
+                    document.getElementById('mk-s').style.opacity = 0;
+                    document.getElementById('mk-p').style.opacity = 0;
+                    btn.disabled = true;
+                    btn.innerText = "已完成";
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
